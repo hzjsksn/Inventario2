@@ -1,227 +1,266 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Painel - v2.9</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fichas de Instrução de Produção</title>
     <style>
-        :root { --bg: #f0f2f5; --card: #ffffff; --text: #333; --qtd-bg: #fff9e6; --primary: #007bff; --secondary: #6c757d; --success: #28a745; --warning: #ff9800; --danger: #dc3545; --purple: #6f42c1; }
-        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 98vh; box-sizing: border-box; }
-        .container { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); width: 100%; max-width: 650px; box-sizing: border-box; }
-        .hidden { display: none !important; }
-        .version-footer { font-size: 10px; color: #bbb; text-align: center; margin-top: 20px; width: 100%; }
-        .input-row { display: flex; width: 100%; margin: 8px 0; background: #fff; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; height: 50px; align-items: center; }
-        .input-row input { flex: 1; border: none; padding: 0 12px; font-size: 16px; outline: none; background: transparent; height: 100%; }
-        .eye-area { width: 55px; height: 100%; background: #f8f9fa; border-left: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        .input-single { width: 100%; height: 50px; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
-        .op-container { display: flex; gap: 8px; justify-content: center; margin: 15px 0; background: #f1f3f5; padding: 10px; border-radius: 10px; width: 100%; }
-        .btn-op { flex: 1; padding: 12px 0; font-size: 18px; border: none; background: var(--secondary); color: white; border-radius: 6px; cursor: pointer; }
-        .btn-op.active { background: var(--success); }
-        button { border: none; border-radius: 8px; cursor: pointer; font-weight: bold; padding: 14px; width: 100%; margin-top: 10px; font-size: 14px; color: white; text-transform: uppercase; }
-        .btn-blue { background: var(--primary); } .btn-purple { background: var(--purple); } .btn-green { background: var(--success); } .btn-gray { background: var(--secondary); }
-        #msgErroLogin { padding: 10px; border-radius: 6px; font-size: 13px; font-weight: bold; text-align: center; margin-bottom: 10px; display: none; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
-        th, td { border: 1px solid #dee2e6; padding: 8px 4px; text-align: left; font-size: 11px; }
-        .qtd-editavel { cursor: pointer; background: var(--qtd-bg); text-align: center; font-weight: bold; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Courier New', monospace; background: #f5f5f5; padding: 20px; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        header { background: #2c3e50; color: white; padding: 20px; margin-bottom: 20px; border-radius: 4px; }
+        h1 { font-size: 24px; margin-bottom: 10px; }
+        .controls { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        button { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2980b9; }
+        button.danger { background: #e74c3c; }
+        button.danger:hover { background: #c0392b; }
+        button.success { background: #27ae60; }
+        button.success:hover { background: #229954; }
+        .docs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .doc-card { background: white; padding: 15px; border-radius: 4px; border-left: 4px solid #3498db; cursor: pointer; transition: all 0.2s; }
+        .doc-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .doc-card.active { background: #e8f4f8; border-left-color: #27ae60; }
+        .doc-card h3 { font-size: 14px; margin-bottom: 5px; }
+        .doc-card p { font-size: 12px; color: #666; margin: 3px 0; }
+        .viewer { background: white; padding: 30px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .doc-header { border: 2px solid #000; padding: 10px; margin-bottom: 15px; font-size: 11px; line-height: 1.4; }
+        .header-row { display: flex; border-bottom: 1px solid #000; }
+        .header-col { flex: 1; padding: 5px; border-right: 1px solid #000; }
+        .header-col:last-child { border-right: none; }
+        .items-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 15px; }
+        .items-table th, .items-table td { border: 1px solid #000; padding: 5px; text-align: left; }
+        .items-table th { background: #f0f0f0; font-weight: bold; }
+        .drawing-section { margin: 30px 0; text-align: center; }
+        .drawing-title { font-weight: bold; margin-bottom: 15px; font-size: 13px; }
+        .color-legend { display: inline-block; margin: 15px 0; border: 1px solid #000; padding: 10px; font-size: 11px; }
+        .color-item { display: flex; align-items: center; margin: 5px 0; }
+        .color-box { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #000; }
+        svg { max-width: 100%; margin: 20px auto; display: block; }
+        .attention { background: #fff3cd; border: 2px solid #ff0000; padding: 15px; margin: 15px 0; font-size: 12px; color: #d32f2f; font-weight: bold; line-height: 1.6; }
+        .search-success { background: #d4edda; border-left: 4px solid #28a745; padding: 10px; border-radius: 4px; color: #155724; font-weight: bold; }
+        .search-error { background: #f8d7da; border-left: 4px solid #dc3545; padding: 10px; border-radius: 4px; color: #721c24; font-weight: bold; }
+        .no-docs { text-align: center; color: #999; padding: 40px; }
+        .actions { margin-top: 20px; display: flex; gap: 10px; }
+        @media print { .controls, .docs-grid { display: none; } .viewer { box-shadow: none; padding: 0; } }
     </style>
 </head>
-<body onload="carregarTudo()">
-
-<div id="photoOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:5000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-    <img id="resultImage" style="max-width:90%; max-height:70%; background:white; margin-bottom:20px;">
-    <button class="btn-gray" onclick="fecharFoto()">FECHAR</button>
-</div>
+<body>
 
 <div class="container">
-    <div id="loginSection">
-        <h2 style="text-align: center;">Painel</h2>
-        <div id="msgErroLogin"></div>
-        <input type="text" id="usuario" class="input-single" placeholder="Usuário" autocomplete="off">
-        <div class="input-row">
-            <input type="password" id="senha" placeholder="Senha">
-            <div class="eye-area" onclick="alternarVisibilidade('senha')">👁️</div>
+    <header>
+        <h1>📋 Fichas de Instrução de Produção</h1>
+        <div class="controls">
+            <button onclick="printCurrent()">🖨️ Imprimir</button>
+            <button onclick="exportJSON()">💾 Exportar</button>
+            <button onclick="location.reload()">🔄 Atualizar</button>
         </div>
-        <div style="display:flex; align-items:center; gap:10px; margin:10px 0;">
-            <input type="checkbox" id="lembrar" style="width:18px; height:18px;"> <label style="font-size:14px; color:#555;">Lembrar acesso</label>
-        </div>
-        <button class="btn-blue" onclick="acessar()">Entrar</button>
-        <span style="color:var(--primary); cursor:pointer; text-decoration:underline; font-size:13px; text-align:center; display:block; margin-top:15px;" onclick="alternarLoginRegistro(true)">Solicitar Registro</span>
+    </header>
+
+    <div style="margin-bottom: 20px;">
+        <input type="text" id="searchInput" placeholder="🔍 Buscar por código do item..." style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #3498db; border-radius: 4px;" onkeyup="searchByItemCode()" autofocus>
+        <div id="searchResult" style="margin-top: 8px;"></div>
     </div>
 
-    <div id="registroSection" class="hidden">
-        <h2 style="text-align: center;">Novo Registro</h2>
-        <input type="text" id="regUsuario" class="input-single" placeholder="Usuário">
-        <div class="input-row">
-            <input type="password" id="regSenha" placeholder="Senha">
-            <div class="eye-area" onclick="alternarVisibilidade('regSenha')">👁️</div>
-        </div>
-        <button class="btn-purple" onclick="registrarNovoUsuario()">Enviar</button>
-        <span style="color:var(--primary); cursor:pointer; text-decoration:underline; font-size:13px; text-align:center; display:block; margin-top:15px;" onclick="alternarLoginRegistro(false)">Voltar</span>
-    </div>
-
-    <div id="menuSection" class="hidden">
-        <h2 style="text-align: center;">Menu</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <button class="btn-blue" onclick="abrirSetor('Inventário')">Inventário</button>
-            <button class="btn-blue" onclick="abrirSetor('Triados')">Triados</button>
-            <button class="btn-blue" onclick="abrirSetor('Pregação')">Pregação</button>
-            <button class="btn-blue" onclick="abrirSetor('Não Triado')">Não Triado</button>
-            <button id="btnMembros" class="btn-purple hidden" style="grid-column: span 2;" onclick="abrirMembros()">Membros (ADM)</button>
-        </div>
-        <button class="btn-gray" onclick="logout()">Sair</button>
-    </div>
-
-    <div id="membrosSection" class="hidden">
-        <h2 style="text-align: center;">Gestão de Membros</h2>
-        <div style="overflow-x: auto;">
-            <table>
-                <thead><tr><th>Usuário</th><th>Senha</th><th>Cargo</th><th>Ação</th></tr></thead>
-                <tbody id="corpoMembros"></tbody>
-            </table>
-        </div>
-        <button class="btn-gray" onclick="voltarAoMenu()">VOLTAR</button>
-    </div>
-
-    <div id="planilhaSection" class="hidden">
-        <div id="areaCadastro">
-            <h4 style="margin:0 0 10px 0; text-align:center; color:var(--purple)">SETOR: <span id="labelSetor"></span></h4>
-            <input type="text" id="novoCod" class="input-single" placeholder="Código">
-            <input type="text" id="novoItem" class="input-single" placeholder="Nome do Produto">
-            <input type="tel" id="novoPreco" class="input-single" placeholder="R$ 0,00" oninput="maskMoeda(this)">
-            <input type="text" id="novoQtd" class="input-single" placeholder="Quantidade">
-            <button class="btn-purple" onclick="adicionarItemNovo()">Cadastrar</button>
-        </div>
-        <div class="op-container">
-            <button id="op-set" class="btn-op active" onclick="setOp('set')">✎</button>
-            <button id="op-add" class="btn-op" onclick="setOp('add')">+</button>
-            <button id="op-sub" class="btn-op" onclick="setOp('sub')">-</button>
-            <button id="op-mul" class="btn-op" onclick="setOp('mul')">×</button>
-            <button id="op-div" class="btn-op" onclick="setOp('div')">÷</button>
-        </div>
-        <div id="areaCapture" style="background:white; padding:5px;"><div id="tabelasSetores"></div></div>
-        <button class="btn-green" onclick="salvarAgoraManual()">💾 SALVAR</button>
-        <button class="btn-blue" style="background:#17a2b8" onclick="tirarFoto()">📸 PRINT</button>
-        <button class="btn-green" style="background:#25d366;" onclick="enviarWhatsAppGeral()">📲 WHATSAPP</button>
-        <button id="btnZerar" style="background:var(--warning)" onclick="zerarQuantidades()">🔄 ZERAR</button>
-        <button class="btn-gray" onclick="voltar()">VOLTAR</button>
-    </div>
+    <div class="docs-grid" id="docs"></div>
+    <div class="viewer" id="viewer"></div>
 </div>
 
-<div class="version-footer">versão 2.9</div>
-
 <script>
-    const SUPER_USER = "37096901"; const SUPER_PASS = "9996057";
-    const K_DATA = 'G_DATA_V27'; const K_MEMB = 'G_MEMB_V27'; const K_LOG = 'G_LOG_V27';
-    let memoria = { 'Inventário': [], 'Triados': [], 'Pregação': [], 'Não Triado': [], 'Quantidade Pedido': [] };
-    let membros = []; let cargoUsuario = ""; let operacaoAtual = 'set';
+const FICHAS_PADRAO = [
+    { id: 1, docol: 'DOC001', data: '19/12/2019', fip: '42061', titulo: 'Tubo Sifon Externo Verde', tipo: 'cilindro', itens: ['1556843 - TUBO SIFON EXTERNO (0)/8 ORO POL PVD', '1556851 - TUBO SIFON EXTERNO (0)/8 GRF POL PVD', '1556859 - TUBO SIFON EXTERNO (0)/8 GRP POL PVD'], obs: '' },
+    { id: 2, docol: 'DOC002', data: '23/01/2024', fip: '51812', titulo: 'Pérola Cab Ana Neutre GRAY', tipo: 'peca_plana', itens: ['6104344 - PERF CAB ANA NEUTRE GRAY VIDRO ESC', '6104370 - PERF CAB ANA NEUTRE GRAY COBRE ESC', '6104378 - PERF CAB ANA NEUTRE GRAY GRAP ESC', '6104472 - PERF CAB ANA NEUTRE GRAY OURO ESC'], obs: 'TRY - OUT' },
+    { id: 3, docol: 'DOC003', data: '21/02/2019', fip: '40483', titulo: 'Caneta Quad 50 GRAY', tipo: 'peca_plana', itens: ['3478844 - CAN QUAD 50 (O)32,5 x 8 PROJ 489 NI ESC', '3478869 - CAN QUAD 50 x (O)32,5 x 8 PROJ 489 CO ESC', '3478870 - CAN QUAD 50 x (O)32,5 x 8 PROJ 489 GRAP ESC'], obs: 'Esento de bolhas/descascamentos/trincas e/ou falta de cobertura' },
+    { id: 4, docol: 'DOC004', data: '26/04/2019', fip: '37035', titulo: 'Porta Letra Technoshower', tipo: 'flange', itens: ['1472244 - PORTA LETRA TECHNOSHOWER NIO ESC PVD', '1472269 - PORTA LETRA TECHNOSHOWER CBR ESC PVD', '1472210 - PORTA LETRA TECHNOSHOWER GRF ESC PVD', '1472272 - PORTA LETRA TECHNOSHOWER ORO ESC PVD'], obs: 'Depositar papelão caixa 03 / Depositar 12 pçs' },
+    { id: 5, docol: 'DOC005', data: '09/07/2018', fip: '37598', titulo: 'Nipple M16 X M24', tipo: 'cilindro', itens: ['1368644 - NIPPLE M16 X M24 NIO ESC PVD', '1368669 - NIPPLE M16 x M24 CBR ESC PVD', '1368670 - NIPPLE M16 X M24 GRF ESC PVD', '1368672 - NIPPLE M16 X M24 ORO ESC PVD'], obs: 'ATENÇÃO - Observar somente a região hachurada (verde). Esta região deverá estar isenta de bolhas, queima e/ou descascamentos.' },
+    { id: 6, docol: 'DOC006', data: '25/09/2019', fip: '40501', titulo: 'Volante Mist PROJ 489', tipo: 'anel', itens: ['3478654 - VOLANTE MIST PROJ 489 NI ESC', '3478665 - VOLANTE MIST PROJ 489 CO ESC', '3478670 - VOLANTE MIST PROJ 489 GRP ESC', '3478672 - VOLANTE MIST PROJ 489 OURO ESC'], obs: '' },
+    { id: 7, docol: 'DOC007', data: '08/12/2017', fip: '37631', titulo: 'Porca G 7/8 x 10,5', tipo: 'anel', itens: ['1556744 - PORCA G 7/8 x 10,5 NIO ESC PVD', '1556769 - PORCA G 7/8 x 10,5 CBR ESC PVD', '1556770 - PORCA G 7/8 x 10,5 GRF ESC PVD', '1556772 - PORCA G 7/8 x 10,5 ORO ESC PVD'], obs: 'Inspecionar apenas a superfície externa da peça. A superfície deve estar totalmente recoberta com PVD. Não deve apresentar bolhas e/ou descascamentos.' },
+    { id: 8, docol: 'DOC008', data: '23/05/2019', fip: '42207', titulo: 'Porca M24 x 13,5', tipo: 'anel', itens: ['1368140 - PORCA M24 x 13,5 CBR POL PVD', '1368148 - PORCA M24 x 13,5 GRF POL PVD', '1368149 - PORCA M24 x 13,5 GRF POL PVD'], obs: 'TRY - OUT. Permitível diferença de tonalidade nesta região 2,5mm Ref.' },
+    { id: 9, docol: 'DOC009', data: '23/05/2019', fip: '42207', titulo: 'Porca Flange 116 x 12.5', tipo: 'flange', itens: ['1367943 - FLANGE M 116 x 12.5 CBR POL PVD', '1367948 - FLANGE M 116 x 12.5 GRF POL PVD', '1367949 - FLANGE M 116 x 12.5 ORO POL PVD'], obs: '' },
+    { id: 10, docol: 'DOC010', data: '28/05/2019', fip: '42059', titulo: 'Tubo Ligação (0) 1,1/2X300', tipo: 'tubo', itens: ['1556843 - TUBO LIGAÇÃO (0)1,1/2X300 CBR POL PVD', '1556851 - TUBO LIGAÇÃO (0)1,1/2X300 GRF POL PVD', '1556858 - TUBO LIGAÇÃO (0)1,1/2X300 GRP POL PVD'], obs: '' },
+    { id: 11, docol: 'DOC011', data: '23/05/2019', fip: '42207', titulo: 'Anel Flange 116 x 12.5', tipo: 'anel', itens: ['1357943 - ANEL FLANGE M 116 x 12.5 CBR POL PVD', '1357948 - ANEL FLANGE M 116 x 12.5 GRF POL PVD'], obs: '' },
+    { id: 12, docol: 'DOC012', data: '17/05/2019', fip: '42073', titulo: 'Porca com Anel', tipo: 'anel', itens: ['2130430 - PORCA G 7/8 x 16 CBR POL PVD', '2130448 - PORCA G 7/8 x 16 ORO ESC PVD', '2130449 - PORCA G 7/8 x 16 GRF POL PVD'], obs: 'ATENÇÃO - Permitível diferença de tonalidade nesta região 2,5mm Ref.' },
+    { id: 13, docol: 'DOC013', data: '23/05/2019', fip: '42207', titulo: 'Can Porca Anel', tipo: 'anel', itens: ['1471930 - CAN (O) 50x14,5 CBR POL PVD', '1471943 - CAN (O) 50x14,5 ORO POL PVD', '1471949 - CAN (O) 50x14,5 GRF POL PVD'], obs: '' },
+    { id: 14, docol: 'DOC014', data: '23/01/2024', fip: '51733', titulo: 'Chapa DOB 585x503', tipo: 'peca_plana', itens: ['6095544 - CHAPA DOB 585X503 GRAY VIDRO ESC', '6095569 - CHAPA DOB 585X503 GRAY COBRE ESC', '6095570 - CHAPA DOB 585X503 GRAY GRAP ESC', '6095572 - CHAPA DOB 585X503 GRAY OURO ESC'], obs: 'TRY - OUT' },
+    { id: 15, docol: 'DOC015', data: '30/08/2018', fip: '37151', titulo: 'Tubo com Alça (0)50,8x120', tipo: 'tubo', itens: ['1556244 - TUBO (0)50,8x120 NIO ESC PVD', '1556269 - TUBO (0)50,8x120 CBR ESC PVD', '1556270 - TUBO (0)50,8x120 GRF ESC PVD', '1556272 - TUBO (0)50,8x120 GRF ESC PVD'], obs: '' },
+    { id: 16, docol: 'DOC016', data: '29/01/2019', fip: '38234', titulo: 'Can Quad 50 x 12 ZAMAK', tipo: 'peca_plana', itens: ['2824444 - CAN QUAD 50 x 12 ZAMAK NIO ESC PVD', '2824150 - CAN QUAD 50 x 12 ZAMAK CBR ESC PVD', '2824170 - CAN QUAD 50 x 12 ZAMAK GRF ESC PVD', '2824172 - CAN QUAD 50 x 12 ZAMAK ORO ESC PVD'], obs: '' },
+    { id: 17, docol: 'DOC017', data: '31/01/2019', fip: '38265', titulo: 'Volante TOR LAV ARGOM', tipo: 'anel', itens: ['3252244 - VOL TOR LAV ARGOM NIO ESC PVD', '3292169 - VOL TOR LAV ARGOM CBR ESC PVD', '3292110 - VOL TOR LAV ARGOM GRF ESC PVD', '3292172 - VOL TOR LAV ARGOM ORO ESC PVD'], obs: 'ATENÇÃO - Permitível diferença de tonalidade nesta região.' },
+    { id: 18, docol: 'DOC018', data: '11/07/2019', fip: '43146', titulo: 'Grade Ducha Higiênica Quadrada', tipo: 'peca_plana', itens: ['4167143 - GRADE DUCHA HIGIENICA QUADRADA NIO ESC', '4167168 - GRADE DUCHA HIGIENICA QUADRADA COBRE ESC', '4167170 - GRADE DUCHA HIGIENICA QUADRADA COBR ESC', '4167172 - GRADE DUCHA HIGIENICA QUADRADA OURO ESC'], obs: '' },
+    { id: 19, docol: 'DOC019', data: '21/11/2017', fip: '37208', titulo: 'Porta Canopla (0)H 31 x 31', tipo: 'peca_plana', itens: ['2077544 - PORTA CANOPLA (0)H 31 x 31 ORO ESC PVD', '2077569 - PORTA CANOPLA (0)H 31 x 31 CBR ESC PVD', '2077570 - PORTA CANOPLA (0)H 31 x 31 GRF PVD', '2077572 - PORTA CANOPLA (0)H 31 x 31 ORO ESC PVD'], obs: 'ATENÇÃO - Inspecionar frente de falta de cromo. Bolhas/queimadura/falta de cobertura.' },
+    { id: 20, docol: 'DOC020', data: '19/12/2019', fip: '37528', titulo: 'Suporte FIX 7/8"x54x(0)16,5', tipo: 'peca_plana', itens: ['1934144 - SUPORTE FIX 7/8"x54x(0)16,5 NIO ESC PVD', '1934169 - SUPORTE FIX 7/8"x54x(0)16,5 CBR ESC PVD', '1934170 - SUPORTE FIX 7/8"x54x(0)16,5 GRF ESC PVD', '1934172 - SUPORTE FIX 7/8"x54x(0)16,5 GRF ESC PVD'], obs: 'ATENÇÃO - Os contornos nas áreas estar arredondados.' },
+    { id: 21, docol: 'DOC021', data: '23/10/2022', fip: '50998', titulo: 'Anel (0)31 x 10', tipo: 'anel', itens: ['2519430 - ANEL (0)31 x 10 COBRE POL PVD', '2519469 - ANEL (0)31 x 10 ORO POL PVD', '2519493 - ANEL (0)31 x 10 GRAP POL PVD'], obs: '' },
+    { id: 22, docol: 'DOC022', data: '19/05/2021', fip: '43050', titulo: 'Corpo TRN-BI', tipo: 'peca_plana', itens: ['2707244 - CORPO TRN-BI NIO ESC PVD', '2707269 - CORPO TRN-BI CBR ESC PVD', '2707270 - CORPO TRN-BI GRF ESC PVD', '2707272 - CORPO TRN-BI GRF ESC PVD'], obs: '' },
+    { id: 23, docol: 'DOC023', data: '24/11/2017', fip: '37390', titulo: 'Bastão (0)3/8"x1"32"x598 - Menor', tipo: 'tubo', itens: ['1336644 - BASTAO (0)3/8"x1"32"x598 NIO ESC PVD', '1336689 - BASTAO (0)3/8"x1"32"x598 CBR ESC PVD', '1336649 - BASTAO (0)3/8"x1"32"x598 GRF ESC PVD', '1336672 - BASTAO (0)3/8"x1"32"x598 ORO ESC PVD'], obs: 'Identificado como MENOR (dimensões reduzidas).' },
+    { id: 24, docol: 'DOC024', data: '26/05/2021', fip: '43948', titulo: 'Bastão Toalheiro Duplo PROJ 486', tipo: 'tubo', itens: ['3899930 - BASTAO TOALHEIRO DUPLO PROJ 486 CORRE POL', '3899943 - BASTAO TOALHEIRO DUPLO PROJ 486 GRAP POL', '3899944 - BASTAO TOALHEIRO DUPLO PROJ 486 OURO POL'], obs: 'Identificado como MAIOR (dimensões aumentadas).' },
+    { id: 25, docol: 'DOC025', data: '30/01/2019', fip: '37352', titulo: 'Can (0)60 x 20 GRAV A LASER', tipo: 'peca_plana', itens: ['3213744 - CAN (0)60 x 20 GRAV A LASER NIO ESC PVD', '3213769 - CAN (0)60 x 20 GRAV A LASER COBRE ESC', '3213770 - CAN (0)60 x 20 GRAV A LASER GRF PVD', '3213772 - CAN (0)60 x 20 GRAV A LASER ORO ESC PVD'], obs: '' },
+    { id: 26, docol: 'DOC026', data: '17/05/2019', fip: '42249', titulo: 'Tubo ACAB (0)38x1.1/2"x200', tipo: 'tubo', itens: ['1851030 - TUBO ACAB (0)38x1.1/2"x200 NIO POL PVD', '1851043 - TUBO ACAB (0)38x1.1/2"x200 CBR POL PVD', '1851048 - TUBO ACAB (0)38x1.1/2"x200 GRF POL PVD'], obs: '' },
+    { id: 27, docol: 'DOC027', data: '28/01/2019', fip: '37074', titulo: 'Traça AC VD SQUARE HALF DOCOL', tipo: 'peca_plana', itens: ['2300444 - TRACA AC VD SQUARE HALF DOCOL NIO ESC PVD', '2300469 - TRACA AC VD SQUARE HALF DOCOL CBR ESC PVD', '2300472 - TRACA AC VD SQUARE HALF DOCOL ORO ESC PVD'], obs: 'Não se aplica / Esento de bolhas / Permitível ondulações nesta região' },
+    { id: 28, docol: 'DOC028', data: '24/06/2019', fip: '42334', titulo: 'Válvula (0)56 x 22,5', tipo: 'anel', itens: ['2542930 - VALVULA (0)56 x 22,5 CBR POL PVD', '2542943 - VALVULA (0)56 x 22,5 ORO POL PVD', '2542948 - VALVULA (0)56 x 22,5 GRF POL PVD'], obs: '' },
+    { id: 29, docol: 'DOC029', data: '28/01/2019', fip: '38253', titulo: 'Tampão (0)26,9 ZAMAK', tipo: 'anel', itens: ['2585644 - TAMPAO (0)26,9 ZAMAK NI ESC PVD', '2585669 - TAMPAO (0)26,9 ZAMAK CBR ESC PVD', '2585670 - TAMPAO (0)26,9 ZAMAK GRF ESC PVD', '2585672 - TAMPAO (0)26,9 ZAMAK ORO ESC PVD'], obs: 'Permitível diferença de tonalidade nesta região.' },
+    { id: 30, docol: 'DOC030', data: '24/05/2019', fip: '42358', titulo: 'Suporte FIX 7/8"x145x(0)16,5', tipo: 'peca_plana', itens: ['2629630 - SUPORTE FIX 7/8"x145x(0)16,5 CBR POL PVD', '2629643 - SUPORTE FIX 7/8"x145x(0)16,5 ORO POL PVD', '2629648 - SUPORTE FIX 7/8"x145x(0)16,5 GRF POL PVD'], obs: '' },
+    { id: 31, docol: 'DOC031', data: '23/05/2019', fip: '42273', titulo: 'Haste (0)3/8"x153', tipo: 'tubo', itens: ['2062530 - HASTE (0)3/8"x153 CBR POL PVD', '2062546 - HASTE (0)3/8"x153 ORO POL PVD', '2062548 - HASTE (0)3/8"x153 GRF POL PVD'], obs: '' },
+    { id: 32, docol: 'DOC032', data: '24/11/2017', fip: '37558', titulo: 'Bastão (0)3/8"x1"32"x221', tipo: 'tubo', itens: ['2062844 - BASTAO (0)3/8"x1"32"x221 NIO ESC PVD', '2062869 - BASTAO (0)3/8"x1"32"x221 CBR ESC PVD', '2062870 - BASTAO (0)3/8"x1"32"x221 GRF ESC PVD', '2062872 - BASTAO (0)3/8"x1"32"x221 ORO ESC PVD'], obs: '' },
+    { id: 33, docol: 'DOC033', data: '14/07/2018', fip: '38184', titulo: 'Vol Mono Argon TAMP', tipo: 'anel', itens: ['3186044 - VOL MONO ARGON TAMP NIO ESC PVD', '3186070 - VOL MONO ARGON TAMP CBR ESC PVD', '3186072 - VOL MONO ARGON TAMP GRF ESC PVD'], obs: 'Usar luvas - Depositar papelão caixa 04 / Forrar com papelão camada do fundo' },
+    { id: 34, docol: 'DOC034', data: '28/01/2019', fip: '37278', titulo: 'Corpo TRN-BJ', tipo: 'peca_plana', itens: ['2710744 - CORPO TRN-BJ NIO ESC PVD', '2710769 - CORPO TRN-BJ CBR ESC PVD', '2710770 - CORPO TRN-BJ GRF PCS PVD', '2710772 - CORPO TRN-BJ ORO ESC PVD'], obs: '' },
+    { id: 35, docol: 'DOC035', data: '23/05/2019', fip: '42267', titulo: 'Haste (0)3/8"x45', tipo: 'tubo', itens: ['2062530 - HASTE (0)3/8"x45 CBR POL PVD', '2062546 - HASTE (0)3/8"x45 ORO POL PVD'], obs: '' },
+    { id: 36, docol: 'DOC036', data: '26/03/2019', fip: '38273', titulo: 'Vol Mono Argon com Atenção', tipo: 'anel', itens: ['3185944 - VOL MONO ARGON CBR ESC PVD', '3185969 - VOL MONO ARGON ORO ESC PVD', '3185970 - VOL MONO ARGON GRF ESC PVD', '3185972 - VOL MONO ARGON GRP ESC PVD'], obs: 'ATENÇÃO - Permitível diferença de tonalidade nesta região.' },
+    { id: 37, docol: 'DOC037', data: '24/05/2019', fip: '42249', titulo: 'Tubo ACAB (0)38x1.1/2"x248', tipo: 'tubo', itens: ['2581030 - TUBO ACAB (0)38x1.1/2"x248 NIO ESC PVD', '2581043 - TUBO ACAB (0)38x1.1/2"x248 CBR POL PVD', '2581048 - TUBO ACAB (0)38x1.1/2"x248 GRF POL PVD'], obs: '' },
+    { id: 38, docol: 'DOC038', data: '24/05/2019', fip: '42328', titulo: 'Can Tubo de Ligação Bacia 1.1/2 x 20', tipo: 'anel', itens: ['2511030 - CAN TUBO DE LIGACAO PARA BACIA 1.1/2 x 20 CBR POL PVD', '2511049 - CAN TUBO DE LIGACAO PARA BACIA 1.1/2 x 20 ORO POL PVD', '2511060 - CAN TUBO DE LIGACAO PARA BACIA 1.1/2 x 20 GRF POL PVD'], obs: '' },
+    { id: 39, docol: 'DOC039', data: '16/10/2018', fip: '40569', titulo: 'Vol Reg (0)75 x 53', tipo: 'anel', itens: ['3490344 - VOL REG (0)75 x 53 (DE) NIO ESC GRAV', '3490369 - VOL REG (0)75 x 53 (DE) CBR ESC GRAV', '3490370 - VOL REG (0)75 x 53 (DE) GRF ESC PVD GRAV', '3490372 - VOL REG (0)75 x 53 (DE) ORO ESC GRAV'], obs: 'Permitível diferença de tonalidade nesta região' },
+    { id: 40, docol: 'DOC040', data: '03/11/2018', fip: '40959', titulo: 'Vol Quadezx65 GRAV', tipo: 'peca_plana', itens: ['3489644 - VOL QUADEZX65 GRAV NIO ESC', '3489569 - VOL QUADEZX65 GRAV COBRE ESC', '3489370 - VOL QUADEZX65 GRAV GRAF ESC', '3489372 - VOL QUADEZX65 GRAV GRF ESC'], obs: 'TRY-OUT' },
+    { id: 41, docol: 'DOC041', data: '(data não legível)', fip: '(fip não legível)', titulo: 'Canopla (0)60, 4X47', tipo: 'anel', itens: ['3485544 - CANOPLA (0)60, 4X47 NIO ESC GRAV', '3485569 - CANOPLA (0)60, 4X47 COBRE ESC GRAV', '3485570 - CANOPLA (0)60, 4 X 47 GRAF ESC GRAV', '3485572 - CANOPLA (0)60, 4X47 OURO ESC GRAV'], obs: '' },
+    { id: 42, docol: 'DOC042', data: '09/04/2015', fip: '40577', titulo: 'Vol Reg (0)75x48.5', tipo: 'anel', itens: ['3469744 - VOL REG (0)75x48.5 2491 NIO ESC GRAV', '3469769 - VOL REG (0)75x48.5 2491 CBR ESC', '3469770 - VOL REG (0)75x48.5 2491 GRF ESC', '3469772 - VOL REG (0)75x48.5 2491 ORO ESC GRAV'], obs: '' },
+    { id: 43, docol: 'DOC043', data: '20/02/2019', fip: '36051', titulo: 'Porca Sere M30x28x34 - Escolha Galvânica', tipo: 'cilindro', itens: ['3199006 - PORCA SERE M30x28x34'], obs: 'Inspeicionar apenas a superfície externa da peça. A Superfície estará totalmente cromada. Não deve apresentar bolhas, queimas e/ou descascamentos.' },
+    { id: 44, docol: 'DOC044', data: '29/01/2019', fip: '39793', titulo: 'Vol (0)114x45x23 Estria', tipo: 'anel', itens: ['2985944 - VOL (0)114x45x23 ESTRIA NIO ESC', '2985869 - VOL (0)114x45x23 ESTRIA CBR ESC', '2985870 - VOL (0)114x45x23 ESTRIA GRF ESC', '2985872 - VOL (0)114x45x23 ESTRIA ORO ESC'], obs: '' },
+    { id: 45, docol: 'DOC045', data: '05/11/2018', fip: '41015', titulo: 'Can (0)130x(0)n58', tipo: 'anel', itens: ['3499744 - CAN (0) 130x(0)n 58 NIO ESC PVD GRAV LASER', '3499769 - CAN (0) 130x(0)n 58 CBR ESC PVD GRAV LASER', '3499770 - CAN (0) 130x(0)n 58 GRF ESC PVD GRAV LASER', '3499772 - CAN (0) 130x(0)n 58 ORO ESC PVD GRAV LASER'], obs: '' },
+    { id: 46, docol: 'DOC046', data: '08/04/2019', fip: '40413', titulo: 'Tecla de Acionamento', tipo: 'peca_plana', itens: ['3511344 - TECLA DE ACIONAMENTO NIO ESC', '3511369 - TECLA DE ACIONAMENTO CBR ESC', '3511370 - TECLA DE ACIONAMENTO GRF ESC', '3511372 - TECLA DE ACIONAMENTO ORO ESC'], obs: '' },
+    { id: 47, docol: 'DOC047', data: '(data não legível)', fip: '(fip não legível)', titulo: 'Vol Mist (0)75 x 58.4', tipo: 'anel', itens: ['3405644 - VOL MIST (0)75 x 58.4 LISS NIO ESC', '3405669 - VOL MIST (0)75 x 58.4 LISS COBRE ESC', '3405670 - VOL MIST (0)75 x 58.4 LISS COBRE ESC', '3405672 - VOL MIST (0)75 x 58.4 LISS OURO ESC'], obs: 'Permitível diferença de tonalidade' },
+    { id: 48, docol: 'DOC048', data: '(data não legível)', fip: '(fip não legível)', titulo: 'Vol Quad3 7x23.1 ZAMAK', tipo: 'peca_plana', itens: ['3493070 - VOL QUAD3 7x23.1 ZAMAK GRF ESC PVD', '3493072 - VOL QUAD3 7x23.1 ZAMAK OURO ESCOVADO'], obs: '' },
+    { id: 49, docol: 'DOC049', data: '07/12/2018', fip: '41243', titulo: 'Pulsador P/ Ducha Manual', tipo: 'anel', itens: ['3373044 - PULSADOR P/ DUCHA MANUAL NI ES', '3373069 - PULSADOR P/ DUCHA MANUAL CO ES', '3373070 - PULSADOR P/ DUCHA MANUAL GRAF ES', '3373072 - PULSADOR P/ DUCHA MANUAL OU ES'], obs: 'TRY-OUT' },
+    { id: 50, docol: 'DOC050', data: '30/08/2019', fip: '40895', titulo: 'Can (0)58x6x61/2', tipo: 'anel', itens: ['3397044 - CAN (0)58x6x61/2 NI ESC PVD', '3397069 - CAN (0)58x6x61/2 CO ESC PVD', '3397070 - CAN (0)58x6x61/2 GRF ESC PVD', '3397072 - CAN (0)58x6x61/2 ORD ESC PVD'], obs: '' },
+    { id: 51, docol: 'DOC051', data: '31/01/2019', fip: '39223', titulo: 'Can (0)52x12 Kaila', tipo: 'anel', itens: ['3350144 - CAN (0) 52x12 KAILA NIO ESC PVD', '3350169 - CAN (0) 52x12 KAILA CBR ESC PVD', '3350170 - CAN (0) 52x12 KAILA GRF ESC PVD', '3350172 - CAN (0) 52x12 KAILA ORO ESC PVD'], obs: '' },
+    { id: 52, docol: 'DOC052', data: '07/02/2019', fip: '41059', titulo: 'Can (0)58x6x(0)21.2', tipo: 'anel', itens: ['3490744 - CAN (0)58x6x(0)21.2 NI ESC PVD', '3490769 - CAN (0)58x6x(0)21.2 CBR ESC PVD', '3490770 - CAN (0)58x6x(0)21.2 GRF ESC PVD', '3490772 - CAN (0)58x6x(0)21.2 ORO ESC PVD'], obs: '' },
+    { id: 53, docol: 'DOC053', data: '01/02/2019', fip: '37411', titulo: 'Can Quad 60x20x32', tipo: 'peca_plana', itens: ['2917744 - CAN QUAD 60x20x32 GRAV NI ESC PVD', '2917769 - CAN QUAD 60x20x32 GRAV CBR ESC PVD', '2917770 - CAN QUAD 60x20x32 GRAV GRF ESC PVD', '2917772 - CAN QUAD 60x20x32 GRAV GRF ESC PVD'], obs: 'Atenção: O contorno não deve conter arredondamento excessivo.' },
+    { id: 54, docol: 'DOC054', data: '14/06/2023', fip: '40459', titulo: 'Can Quad 50', tipo: 'peca_plana', itens: ['3490544 - CAN QUAD 50 x (0)32.5 x 8 NIO GRAVADA', '3490569 - CAN QUAD 50 x (0)32.5 x 8 PROJ 489 CBR GRAV GRAVADA', '3490570 - CAN QUAD 50 x (0)32.5 x 8 PROJ 489 GRF ESC GRAVADA', '3490572 - CAN QUAD 50 x (0)32.5 x 8 PROJ 489 GREF ESC GRAVADA'], obs: '' }
+];
 
-    function maskMoeda(i) { let v = i.value.replace(/\D/g, ""); v = (v/100).toFixed(2).replace(".",","); i.value = "R$ " + v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."); }
-    function alternarVisibilidade(id) { const i = document.getElementById(id); i.type = i.type === "password" ? "text" : "password"; }
+let fichas = FICHAS_PADRAO;
+let current = null;
+
+function init() {
+    renderCards();
+    if (fichas.length > 0) selectFicha(0);
+}
+
+function renderCards() {
+    const html = fichas.map((f, i) => {
+        const codigos = f.itens.map(item => item.split(' - ')[0]).join(', ');
+        return `
+        <div class="doc-card ${current?.id === f.id ? 'active' : ''}" onclick="selectFicha(${i})">
+            <h3>${f.titulo}</h3>
+            <p><strong>DOCOL:</strong> ${f.docol}</p>
+            <p><strong>Códigos:</strong> ${codigos}</p>
+        </div>
+    `}).join('');
+    document.getElementById('docs').innerHTML = html || '<div class="no-docs">Sem fichas</div>';
+}
+
+function selectFicha(i) {
+    current = fichas[i];
+    renderCards();
+    renderViewer();
+    document.getElementById('searchInput').value = '';
+}
+
+function searchByItemCode() {
+    const query = document.getElementById('searchInput').value.trim().toUpperCase();
     
-    function carregarTudo() { 
-        const d = localStorage.getItem(K_DATA); if(d) memoria = JSON.parse(d);
-        const m = localStorage.getItem(K_MEMB); if(m) membros = JSON.parse(m);
-        const l = localStorage.getItem(K_LOG); if(l) { const o=JSON.parse(l); document.getElementById('usuario').value=o.u; document.getElementById('senha').value=o.s; document.getElementById('lembrar').checked=true; }
+    if (!query) {
+        renderCards();
+        document.getElementById('searchResult').innerHTML = '';
+        return;
     }
-
-    function saveM() { localStorage.setItem(K_MEMB, JSON.stringify(membros)); }
-
-    function dispararAviso(t, tipo) { const d = document.getElementById('msgErroLogin'); d.innerText = t; d.style.display = "block"; d.style.background = tipo === "erro" ? "#ffebee" : "#e8f5e9"; d.style.color = tipo === "erro" ? "#c62828" : "#2e7d32"; }
     
-    function acessar() {
-        const u = document.getElementById('usuario').value.trim(); const s = document.getElementById('senha').value.trim(); const lemb = document.getElementById('lembrar').checked;
-        if(u === SUPER_USER && s === SUPER_PASS) { cargoUsuario = "Supervisor"; document.getElementById('btnMembros').classList.remove('hidden'); return finalizarLogin(u,s,lemb); }
-        let m = membros.find(x => x.user === u);
-        if(!m) return dispararAviso("Não cadastrado!", "erro");
-        if(m.pass !== s) return dispararAviso("Senha errada!", "erro");
-        if(!m.aprovado) return dispararAviso("Acesso Pendente!", "erro");
-        cargoUsuario = m.cargo; finalizarLogin(u,s,lemb);
-    }
-
-    function finalizarLogin(u,s,l) { if(l) localStorage.setItem(K_LOG, JSON.stringify({u,s})); else localStorage.removeItem(K_LOG); document.getElementById('loginSection').classList.add('hidden'); document.getElementById('menuSection').classList.remove('hidden'); }
+    const found = fichas.find(f => 
+        f.itens.some(item => item.toUpperCase().includes(query))
+    );
     
-    function registrarNovoUsuario() {
-        const u = document.getElementById('regUsuario').value.trim(); const s = document.getElementById('regSenha').value.trim(); if(!u || !s) return;
-        membros.push({ user: u, pass: s, data: new Date().toLocaleDateString(), cargo: "Colaborador", aprovado: false });
-        saveM(); alternarLoginRegistro(false); dispararAviso("Solicitado!", "sucesso");
+    if (found) {
+        current = found;
+        renderCards();
+        renderViewer();
+        document.getElementById('searchResult').innerHTML = `<div class="search-success">✓ Encontrado: ${found.docol} - ${found.titulo}</div>`;
+    } else {
+        document.getElementById('docs').innerHTML = '<div class="no-docs" style="grid-column: 1/-1;">Nenhuma ficha encontrada com esse código</div>';
+        document.getElementById('viewer').innerHTML = '';
+        document.getElementById('searchResult').innerHTML = `<div class="search-error">✗ Código não encontrado: ${query}</div>`;
     }
+}
 
-    function aprovarMembro(i) {
-        membros[i].aprovado = true;
-        saveM();
-        renderMembros();
-    }
-
-    function abrirSetor(n) { 
-        window.setorAtivo = n; document.getElementById('labelSetor').innerText = n;
-        document.getElementById('novoCod').value = ""; document.getElementById('novoItem').value = ""; document.getElementById('novoPreco').value = ""; document.getElementById('novoQtd').value = "";
-        const isAux = cargoUsuario === "Auxiliar";
-        document.getElementById('areaCadastro').classList.toggle('hidden', isAux); document.getElementById('btnZerar').classList.toggle('hidden', isAux);
-        document.getElementById('menuSection').classList.add('hidden'); document.getElementById('planilhaSection').classList.remove('hidden'); render();
-    }
-
-    function setOp(op) { operacaoAtual = op; document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active')); document.getElementById('op-'+op).classList.add('active'); }
+function renderViewer() {
+    if (!current) return;
     
-    function calc(i) {
-        const n = prompt("Valor:"); if(n !== null && n !== "") {
-            let v = parseFloat(n) || 0; let it = memoria[window.setorAtivo][i];
-            if(operacaoAtual === 'set') it.qtd = v; else if(operacaoAtual === 'add') it.qtd += v; else if(operacaoAtual === 'sub') it.qtd -= v;
-            else if(operacaoAtual === 'mul') it.qtd *= v; else if(operacaoAtual === 'div') it.qtd = v !== 0 ? it.qtd/v : it.qtd;
-            it.qtd = isNaN(it.qtd) ? 0 : Math.round(it.qtd * 100) / 100; render();
-        }
-    }
+    const itensHtml = current.itens.map((item, i) => {
+        const [cod, desc] = item.split(' - ');
+        return `<tr><td>${String(i+1).padStart(2, '0')}</td><td>${cod}</td><td>${desc}</td></tr>`;
+    }).join('');
 
-    function adicionarItemNovo() {
-        const c = document.getElementById('novoCod').value; const it = document.getElementById('novoItem').value; const p = document.getElementById('novoPreco').value || "R$ 0,00"; const q = document.getElementById('novoQtd').value || "0";
-        if(!c || !it) return; memoria[window.setorAtivo].push({ cod: c, item: it, qtd: q, preco: p }); render();
-        document.getElementById('novoCod').value = ""; document.getElementById('novoItem').value = ""; document.getElementById('novoPreco').value = ""; document.getElementById('novoQtd').value = "";
-    }
+    const svg = getSVG(current.tipo);
+    const obs = current.obs ? `<div class="attention">⚠️ ${current.obs}</div>` : '';
 
-    function render() {
-        const c = document.getElementById('tabelasSetores'); c.innerHTML = `<div style="background:#eee; padding:5px; font-weight:bold; text-align:center;">${window.setorAtivo}</div>`;
-        const t = document.createElement('table'); t.innerHTML = `<thead><tr><th>Cód</th><th>Item</th><th>Qtd</th><th>Preço</th><th>X</th></tr></thead><tbody id="corpoAtivo"></tbody>`;
-        c.appendChild(t); const cb = document.getElementById('corpoAtivo');
-        memoria[window.setorAtivo].forEach((o, i) => {
-            const eqtd = cargoUsuario === "Auxiliar" ? `<td>${o.qtd}</td>` : `<td class="qtd-editavel" onclick="calc(${i})">${o.qtd}</td>`;
-            cb.innerHTML += `<tr><td>${o.cod}</td><td>${o.item}</td>${eqtd}<td>${o.preco}</td><td><button style="background:red; color:white; border:none; border-radius:4px; padding:2px 5px;" onclick="memoria[window.setorAtivo].splice(${i},1); render();">❌</button></td></tr>`;
-        });
-    }
+    document.getElementById('viewer').innerHTML = `
+        <div class="doc-header">
+            <div class="header-row">
+                <div class="header-col"><strong>DOCOL</strong></div>
+                <div class="header-col"><strong>FICHA DE INSTRUÇÃO DE PRODUÇÃO</strong></div>
+                <div class="header-col" style="flex: 0.6;"><strong>DATA:</strong> ${current.data}</div>
+                <div class="header-col" style="flex: 0.4;"><strong>FIP:</strong> ${current.fip}</div>
+            </div>
+            <div class="header-row">
+                <div class="header-col">${current.docol}</div>
+            </div>
+        </div>
 
-    function enviarWhatsAppGeral() {
-        let txt = "*Relatório - Gabriel*%0A%0A"; let d = false;
-        Object.keys(memoria).forEach(s => { const it = memoria[s].filter(x => x.qtd != 0); if(it.length > 0) { d = true; txt += `--- *${s.toUpperCase()}* ---%0A`; it.forEach(i => txt += `📦 ${i.item} | Qtd: ${i.qtd}%0A`); } });
-        if(d) window.open(`https://wa.me/?text=${txt}`, '_blank');
-    }
+        <table class="items-table">
+            <thead>
+                <tr><th style="width: 30px;">Nº</th><th>ITEM</th><th>DESCRIÇÃO</th></tr>
+            </thead>
+            <tbody>${itensHtml}</tbody>
+        </table>
 
-    function tirarFoto() { html2canvas(document.getElementById('areaCapture')).then(canvas => { document.getElementById('resultImage').src = canvas.toDataURL(); document.getElementById('photoOverlay').classList.remove('hidden'); }); }
-    function alternarLoginRegistro(r) { document.getElementById('loginSection').classList.toggle('hidden', r); document.getElementById('registroSection').classList.toggle('hidden', !r); }
-    function abrirMembros() { document.getElementById('menuSection').classList.add('hidden'); document.getElementById('membrosSection').classList.remove('hidden'); renderMembros(); }
-    
-    function renderMembros() {
-        const c = document.getElementById('corpoMembros'); c.innerHTML = "";
-        membros.forEach((m, i) => {
-            const ac = m.aprovado ? 
-                `<button style="background:red; color:white; border:none; padding:4px; border-radius:4px;" onclick="membros.splice(${i},1); saveM(); renderMembros();">❌</button>` : 
-                `<button style="background:green; color:white; border:none; padding:4px; border-radius:4px;" onclick="aprovarMembro(${i})">✅</button>`;
-            
-            c.innerHTML += `<tr><td>${m.user}</td><td>${m.pass}</td><td>
-                <select onchange="membros[${i}].cargo=this.value; saveM();" style="font-size:10px;">
-                    <option value="Supervisor" ${m.cargo==='Supervisor'?'selected':''}>Supervisor</option>
-                    <option value="Colaborador" ${m.cargo==='Colaborador'?'selected':''}>Colaborador</option>
-                    <option value="Auxiliar" ${m.cargo==='Auxiliar'?'selected':''}>Auxiliar</option>
-                    ${!m.aprovado ? '<option value="Pendente" selected disabled>Pendente</option>' : ''}
-                </select>
-            </td><td>${ac}</td></tr>`;
-        });
-    }
+        ${obs}
 
-    function salvarAgoraManual() { localStorage.setItem(K_DATA, JSON.stringify(memoria)); saveM(); alert("Salvo!"); }
-    function fecharFoto() { document.getElementById('photoOverlay').classList.add('hidden'); }
-    function logout() { location.reload(); }
-    function voltar() { document.getElementById('planilhaSection').classList.add('hidden'); document.getElementById('menuSection').classList.remove('hidden'); }
-    function voltarAoMenu() { document.getElementById('membrosSection').classList.add('hidden'); document.getElementById('menuSection').classList.remove('hidden'); }
-    function zerarQuantidades() { if(confirm("Zerar tudo?")) { memoria[window.setorAtivo].forEach(i => i.qtd = 0); render(); } }
+        <div class="drawing-section">
+            <div class="drawing-title">Acabamento de Superfície - Área de Visibilidade</div>
+            <div class="color-legend">
+                <div class="color-item"><div class="color-box" style="background: #ff0000;"></div><span>Área A</span></div>
+                <div class="color-item"><div class="color-box" style="background: #0000ff;"></div><span>Área B</span></div>
+                <div class="color-item"><div class="color-box" style="background: #00aa00;"></div><span>Área C</span></div>
+            </div>
+            ${svg}
+        </div>
+
+        <div class="actions">
+            <button onclick="printCurrent()">🖨️ Imprimir</button>
+            <button onclick="exportJSON()" class="success">💾 Exportar</button>
+        </div>
+    `;
+}
+
+function getSVG(tipo) {
+    const s = 300, cx = s/2, cy = s/2;
+    switch(tipo) {
+        case 'cilindro':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%"><stop offset="0%" style="stop-color:#00aa00;stop-opacity:0.8"/><stop offset="100%" style="stop-color:#006600;stop-opacity:0.8"/></linearGradient></defs><ellipse cx="${cx}" cy="${cy-40}" rx="70" ry="25" fill="url(#g1)" stroke="#000" stroke-width="2"/><rect x="${cx-70}" y="${cy-40}" width="140" height="120" fill="url(#g1)" stroke="#000" stroke-width="2"/><ellipse cx="${cx}" cy="${cy+80}" rx="70" ry="25" fill="#00aa00" stroke="#000" stroke-width="2"/></svg>`;
+        case 'anel':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}"><circle cx="${cx}" cy="${cy}" r="80" fill="#00aa00" stroke="#000" stroke-width="2" opacity="0.8"/><circle cx="${cx}" cy="${cy}" r="50" fill="white" stroke="#000" stroke-width="2"/></svg>`;
+        case 'flange':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}"><rect x="${cx-90}" y="${cy-30}" width="180" height="60" rx="10" fill="#0000ff" stroke="#000" stroke-width="2" opacity="0.8"/><circle cx="${cx}" cy="${cy}" r="35" fill="white" stroke="#000" stroke-width="2"/><circle cx="${cx-60}" cy="${cy-35}" r="6" fill="#000"/><circle cx="${cx+60}" cy="${cy-35}" r="6" fill="#000"/><circle cx="${cx-60}" cy="${cy+35}" r="6" fill="#000"/><circle cx="${cx+60}" cy="${cy+35}" r="6" fill="#000"/></svg>`;
+        case 'peca_plana':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}"><rect x="${cx-80}" y="${cy-60}" width="160" height="120" fill="#ff0000" stroke="#000" stroke-width="2" opacity="0.8"/><circle cx="${cx-50}" cy="${cy-30}" r="5" fill="#000"/><circle cx="${cx+50}" cy="${cy-30}" r="5" fill="#000"/><circle cx="${cx-50}" cy="${cy+30}" r="5" fill="#000"/><circle cx="${cx+50}" cy="${cy+30}" r="5" fill="#000"/></svg>`;
+        case 'tubo':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}"><defs><linearGradient id="g2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#00aa00;stop-opacity:0.8"/><stop offset="50%" style="stop-color:#008800;stop-opacity:0.8"/><stop offset="100%" style="stop-color:#00aa00;stop-opacity:0.8"/></linearGradient></defs><g transform="translate(${cx}, ${cy}) rotate(-20)"><rect x="-60" y="-30" width="120" height="60" rx="10" fill="url(#g2)" stroke="#000" stroke-width="2"/><ellipse cx="-60" cy="0" rx="18" ry="30" fill="url(#g2)" stroke="#000" stroke-width="2"/><ellipse cx="60" cy="0" rx="18" ry="30" fill="url(#g2)" stroke="#000" stroke-width="2"/></g></svg>`;
+        default: return '';
+    }
+}
+
+function printCurrent() {
+    if (!current) return;
+    window.print();
+}
+
+function exportJSON() {
+    const json = JSON.stringify(fichas, null, 2);
+    const blob = new Blob([json], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fichas_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+}
+
+window.addEventListener('load', init);
 </script>
+
 </body>
 </html>
